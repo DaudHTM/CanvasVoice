@@ -1,0 +1,22 @@
+{
+    "manifest_version": 3,
+    "name": "CanvasVoice",
+    "version": "0.1",
+    "permissions": [
+        "activeTab",
+        "storage","input","tts"
+      ],
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": ["main.js"]
+        }
+    ],
+    "background":
+        {
+        "service_worker" :"background.js"
+        }
+    
+}
