@@ -4,7 +4,7 @@
     "version": "0.1",
     "permissions": [
         "activeTab",
-        "storage","input","tts"
+        "storage","input","tts","debugger"
       ],
     "content_scripts": [
         {

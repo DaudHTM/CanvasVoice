@@ -4,6 +4,7 @@ var focusedElement = null;
 
 var heyCanvas = false
 var clickMode = false
+var currentMode = ""
 
 document.addEventListener('focus', function(event) {
   focusedElement = event.target;
@@ -118,16 +119,16 @@ function startRecognition() {
       });
     }
 
-    if(heyCanvas && final_transcript.length>3){
+    if(currentMode=="heycanvas" && final_transcript.length>3){
       var aiInput = "["+getAllVisibleSpanDivTexts().join(', ')+"]     \n"
       aiInput = aiInput + final_transcript
       chrome.runtime.sendMessage({ action: "palm", text:aiInput }, function(response) {
         console.log(response);
       });
 
-      heyCanvas=false
+      currentMode=""
     }
-    else if(clickMode && final_transcript.length>3){
+    else if(currentMode=="click" && final_transcript.length>3){
 
         let elementsWithText = findElementsWithText(strip(final_transcript));
     
@@ -148,28 +149,77 @@ function startRecognition() {
         
       }
 
-        clickMode=false
+        currentMode=""
+    }    else if(currentMode=="clickbox" && final_transcript.length>3){
+
+      let elementsWithText = findInputFromText(strip(final_transcript));
+  
+      console.log(elementsWithText)
+  
+      
+      if(elementsWithText.length>0){
+  
+          ela = elementsWithText[elementsWithText.length-1]
+          console.log(ela)
+       
+  
+          ela.focus();
+  
+  
+      
+    }
+
+      currentMode=""
+  }
+    else if(currentMode=="typing" && final_transcript.length>0){
+      console.log("d")
+      chrome.runtime.sendMessage({ action: "typing", text:final_transcript }, function(response) {
+        console.log(response);
+      });
+
+      if(strip(final_transcript)=="stoptyping"){
+        chrome.runtime.sendMessage({ action: "speak", text:"stop typing" }, function(response) {
+          console.log(response);
+        });
+        currentMode=""
+        return
+      }
+
+      simulateTyping(final_transcript)
+
+      
     }
 
 
 
-
     console.log(strip(final_transcript))
+
     if (strip(final_transcript) == "heycanvas" ){
       console.log("YES")
       chrome.runtime.sendMessage({ action: "speak", text:"yes" }, function(response) {
         console.log(response);
       });
-      heyCanvas = true
+      currentMode="heycanvas"
     }
     else if(strip(final_transcript) == "click" ){
 
       chrome.runtime.sendMessage({ action: "speak", text:"yes" }, function(response) {
         console.log(response);
       });
-      clickMode = true
+      currentMode="click"
     }
+    else if(strip(final_transcript) == "type" ){
 
+      chrome.runtime.sendMessage({ action: "speak", text:"typing" }, function(response) {
+        console.log(response);
+      });
+      currentMode="typing"
+    }else if(strip(final_transcript)=="clickbox"){
+      chrome.runtime.sendMessage({ action: "speak", text:"yes" }, function(response) {
+        console.log(response);
+      });
+      currentMode="clickbox"
+    }
 
 
     
@@ -236,4 +286,93 @@ console.log(elementsWithText);
 
 var fullText = getAllVisibleSpanDivTexts();
 console.log(fullText); // You can replace this with whatever you want to do with the result
+
+
+let inputBoxes = findInputFromText("question");
+console.log(inputBoxes);
+
+inputBoxes[inputBoxes.length-1].click();
+
 })
+
+function simulateTyping(text) {
+  // Get the active element
+  var activeElement = document.activeElement;
+
+  console.log(activeElement)
+
+  // Check if the active element is an input field, textarea, or a Google Docs iframe
+  if (
+    activeElement &&
+    (activeElement.tagName.toLowerCase() == 'input' ||
+      activeElement.tagName.toLowerCase() == 'textarea' ||
+      (activeElement.tagName.toLowerCase() == 'iframe' &&
+        activeElement.className.includes('docs-texteventtarget-iframe')))
+  ) {
+    // Set the value of the active element to the input text
+    if (activeElement.tagName.toLowerCase() == 'iframe') {
+      // For Google Docs iframe, set innerHTML instead of value
+      activeElement.contentDocument.body.innerHTML = text;
+    } else {
+      activeElement.value = text;
+    }
+
+    // Create a new input event
+    var event = new Event('input', {
+      bubbles: true,
+      cancelable: true,
+    });
+
+    // Dispatch the event
+    activeElement.dispatchEvent(event);
+  } else {
+    console.log('No input field or text box is currently selected.');
+  }
+}
+
+
+
+
+function findInputFromText(searchText) {
+  // Function to recursively check if an element or its children contain the search text
+  function containsSearchInput(element) {
+    if (strip(element.textContent.toLowerCase()).includes(strip(searchText.toLowerCase()))) {
+      return true;
+    }
+    for (let child of element.children) {
+      if (containsSearchInput(child)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Function to recursively find input elements
+  function findInput(element) {
+    if (element.tagName === 'INPUT') {
+      return element;
+    }
+    for (let child of element.children) {
+      let result = findInput(child);
+      if (result) {
+        return result;
+      }
+    }
+    return null;
+  }
+
+  // Get all elements on the page
+  let allElements = document.querySelectorAll('*');
+
+  // Filter elements that contain the search text
+  let containingText = Array.from(allElements).filter(el => containsSearchInput(el));
+
+  // Find input elements for each containing text element
+  let inputElements = containingText.map(el => findInput(el)).filter(el => el !== null);
+
+  return inputElements;
+}
+
+
+
+

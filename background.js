@@ -66,6 +66,9 @@ chrome.runtime.onMessage.addListener(function(action,sender,sendResponse) {
   else if(action.action=="stop"){
     stopSpeaking()
   }
+  else if(action.action=="typing"){
+    
+  }
 });
 
 
@@ -82,4 +85,23 @@ function stopSpeaking(){
   chrome.tts.stop();
 }
 
+function getTabID(){
+chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+  var tabId = tabs[0].id;
+  console.log(tabId);
+});
+return tabId
+}
 
+function simulateKeyPresses(text) {
+  console.log("DFDF")
+  // Attach the debugger to the tab
+  chrome.debugger.attach({ tabId: tabId }, '1.0', function() {
+      // Once the debugger is attached, we can send commands
+      for (let i = 0; i < text.length; i++) {
+          chrome.debugger.sendCommand({ tabId: getTabID }, 'Input.dispatchKeyEvent', { type: 'char', text: text[i] });
+      }
+      // Detach the debugger when we're done
+      chrome.debugger.detach({ tabId: tabId });
+  });
+}
