@@ -14,6 +14,10 @@ document.addEventListener('blur', function() {
   focusedElement = null;
 });
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 function strip(str){
  return str.replace(/\n/g, '').replace(/\s/g, '')
 }
@@ -91,10 +95,16 @@ navigator.permissions.query({name:'microphone'}).then(function(permissionStatus)
     });
     document.body.appendChild(button);
   }
+
+
 });
 
-function startRecognition() {
-  let recognition = new webkitSpeechRecognition();
+
+
+
+async function startRecognition() {
+  await sleep(50);
+  var recognition = new webkitSpeechRecognition();
   recognition.continuous = true;
   recognition.interimResults = true;
 
@@ -124,6 +134,13 @@ function startRecognition() {
       aiInput = aiInput + final_transcript
       chrome.runtime.sendMessage({ action: "palm", text:aiInput }, function(response) {
         console.log(response);
+
+        chrome.runtime.sendMessage({ action: "addMessage", textUser:final_transcript,textResponse:response }, function(response) {
+          console.log(response);
+  
+          
+        });
+
       });
 
       currentMode=""
@@ -226,8 +243,15 @@ function startRecognition() {
   };
 
   recognition.start();
-}
 
+  
+
+ 
+}
+setInterval(function() {
+  startRecognition()
+  console.log("DF")
+}, 10000);
 
 function toArray(arraylike) {
   var array= new Array(arraylike.length);
@@ -291,7 +315,6 @@ console.log(fullText); // You can replace this with whatever you want to do with
 let inputBoxes = findInputFromText("question");
 console.log(inputBoxes);
 
-inputBoxes[inputBoxes.length-1].click();
 
 })
 

@@ -1,16 +1,24 @@
 
 
 
-const API_KEY = "AIzaSyCRPaK9JQsNtoCFMMY9EHrdd8rzYHHHV18";
+
+var API_KEY = chrome.storage.local["key"]
+API_KEY = "AIzaSyCkMLIUWOXqXa5GxnR3tH7e5eOzzZuocHs"
+  const url = 'https://generativelanguage.googleapis.com/v1beta3/models/text-bison-001:generateText?key='+API_KEY;
 
 
-const url = 'https://generativelanguage.googleapis.com/v1beta3/models/text-bison-001:generateText?key='+API_KEY;
-const context = "You are Canvas Voice, a virtual guide for the Howard County Public School System's Canvas platform, Google Drive, and Synergy. Your role is to assist students in navigating these tools with precise step-by-step instructions. When responding, provide only the requested information without additional explanations, instructions, or supplementary details. Focus solely on giving concise navigation assistance; do not offer information unrelated to the platform. Remember to emphasize the tools used by HCPSS, including Canvas, Google Drive, and Synergy. If a student requests additional information, provide it only if directly related to their original question. No need for signing in stepNavigation will start from the current page that the user is onalong with this, provide an 2d array at the end based on all the steps. for each array inside the array will containt first the action such as click and what to clickif the instruction need to click a certain course simply state course choice if the prompt is not a question but an action jus return the 2d array."
+
+
+
+
+const context = "You are Canvas Voice, a virtual guide for the Howard County Public School System's Canvas platform, Google Drive, and Synergy. Your role is to assist students in navigating these tools with precise step-by-step instructions. When responding, provide only the requested information without additional explanations, instructions, or supplementary details. Focus solely on giving concise navigation assistance; do not offer information unrelated to the platform. Remember to emphasize the tools used by HCPSS, including Canvas, Google Drive, and Synergy. If a student requests additional information, provide it only if directly related to their original question. No need for signing in stepNavigation will start from the current page that the user is on along with this"
 const messages = [];
 
 
 async function palmAI(text){
 
+
+  
 messages.push({ "content": text });
 
 const data = {
@@ -51,14 +59,16 @@ chrome.runtime.onMessage.addListener(function(action,sender,sendResponse) {
   if(action.action=="palm"){
     palmAI(action.text)
   .then(output => {
-
+    sendResponse(output);
     speak(output)
     console.log('Returned Output:', output);
+    
 
   })
   .catch(error => {
     console.error('Error:', error);
   });
+  return true;
   }
   else if(action.action=="speak"){
     speak(action.text)
@@ -66,8 +76,10 @@ chrome.runtime.onMessage.addListener(function(action,sender,sendResponse) {
   else if(action.action=="stop"){
     stopSpeaking()
   }
-  else if(action.action=="typing"){
-    
+  else if(action.action=="configapi"){
+    API_KEY=action.text
+
+chrome.storage.local["key"] = action.text
   }
 });
 

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
+
+    <title>CanvasVoice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 10px;
+        }
+
+        #chat-container {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    height: 500px; /* Increased height */
+    overflow-y: scroll;
+    padding: 20px;
+}
+#settings-container{
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    height: 500px; /* Increased height */
+    display: none;
+    padding: 20px;
+    min-width: 150px;
+}
+        #chat-messages {
+            margin-bottom: 10px;
+        }
+
+        #input-container {
+            display: flex;
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 5px;
+        }
+
+        #send-button {
+            margin-left: 10px;
+            padding: 5px 10px;
+        }
+
+        .user-message {
+            background-color: #f2f2f2;
+            padding: 5px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+
+        .assistant-message {
+            background-color: #4caf50;
+            color: #fff;
+            padding: 5px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            white-space: pre-wrap;
+        }
+        #palm-tos-container {
+            text-align: center;
+            margin-top: 10px;
+            display: block;
+        }
+
+        #palm-tos-button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: block;
+        }
+        #navbar{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+
+
+<body>
+    <div id="navbar">
+    <div id="settings-icon-container">
+        <a href="#" id="settings-icon"><img height="30px" width="30px" src="settings-icon.png" alt="Settings"></a></div>
+        <div id="palm-tos-container">
+            <div id="palm-tos-button">Chat</div>
+        </div>
+
+      
+    
+    
+
+</div>
+</div>
+<div id="settings-container">
+    <input type="text" id="api-key-input" placeholder="Enter API Key">
+    <button id="save-button">Save</button>
+    
+</div>
+    <div id="chat-container">
+        <div id="chat-messages"></div>
+        <div id="input-container">
+            <input type="text" id="user-input" placeholder="Type a message...">
+            <button id="send-button">Send</button>
+        </div>
+    </div>
+    <script src="popup.js"></script>
+ 
+</body>
+</html>
