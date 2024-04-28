@@ -3,7 +3,7 @@
 
 
 var API_KEY = chrome.storage.local["key"]
-API_KEY = "AIzaSyCkMLIUWOXqXa5GxnR3tH7e5eOzzZuocHs"
+API_KEY = ""
   const url = 'https://generativelanguage.googleapis.com/v1beta3/models/text-bison-001:generateText?key='+API_KEY;
 
 
